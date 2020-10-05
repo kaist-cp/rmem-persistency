@@ -149,3 +149,9 @@ let write_two_regs r1 r2 vec =
     then slice vec (size_r1 - start_vec) (size_vec - start_vec)
     else slice vec (start_vec - size_r1) (start_vec - size_vec) in
   write_reg r1 r1_v >> write_reg r2 r2_v
+
+
+val cache_op : cache_op_kind -> vector bitU -> M unit
+let cache_op cop addr =
+  let addr = address_lifted_of_bitv addr in
+  O_Cache_op (cop, addr) (O_Done ())

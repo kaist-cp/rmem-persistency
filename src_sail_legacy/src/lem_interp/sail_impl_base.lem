@@ -624,6 +624,7 @@ type cache_op_kind =
   (* AArch64 DC *)
   | Cache_op_D_IVAC | Cache_op_D_ISW  | Cache_op_D_CSW  |  Cache_op_D_CISW
   | Cache_op_D_ZVA  | Cache_op_D_CVAC | Cache_op_D_CVAU | Cache_op_D_CIVAC
+  | Cache_op_D_CVAP
   (* AArch64 IC *)
   | Cache_op_I_IALLUIS | Cache_op_I_IALLU | Cache_op_I_IVAU
 
@@ -636,6 +637,7 @@ let stringFromCache_op_kind = function
   | Cache_op_D_CVAC    -> "Cache_op_D_CVAC"
   | Cache_op_D_CVAU    -> "Cache_op_D_CVAU"
   | Cache_op_D_CIVAC   -> "Cache_op_D_CIVAC"
+  | Cache_op_D_CVAP    -> "Cache_op_D_CVAP"
   | Cache_op_I_IALLUIS -> "Cache_op_I_IALLUIS"
   | Cache_op_I_IALLU   -> "Cache_op_I_IALLU"
   | Cache_op_I_IVAU    -> "Cache_op_I_IVAU"
@@ -843,6 +845,8 @@ type outcome 'a =
   | O_Internal of (maybe string * maybe (unit -> string)) * outcome 'a
   | O_Done of 'a
   | O_Error of string
+  (* Request a cache operation *)
+  | O_Cache_op of (cache_op_kind * address_lifted) * outcome 'a
 
 
 (** operations and coercions on basic values *)

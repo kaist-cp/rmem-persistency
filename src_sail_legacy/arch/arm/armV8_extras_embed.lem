@@ -94,3 +94,5 @@ let TMCommitEffect () = barrier Barrier_TM_COMMIT
 let duplicate_bits (Vector bits start direction,len) =
   let bits' = repeat bits len in
   Vector bits' start direction
+
+let DataCacheOperation_CVAP (addr) = cache_op Cache_op_D_CVAP addr

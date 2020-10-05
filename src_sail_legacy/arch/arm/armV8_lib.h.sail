@@ -219,7 +219,7 @@ typedef SystemOp =
   enumerate {Sys_AT; Sys_DC; Sys_IC; Sys_TLBI; Sys_SYS}
 
 typedef DCOp =
-  enumerate {IVAC; ISW; CSW; CISW; ZVA; CVAC; CVAU; CIVAC}
+  enumerate {IVAC; ISW; CSW; CISW; ZVA; CVAC; CVAU; CIVAC; CVAP}
 
 typedef ICOp =
   enumerate {IALLUIS; IALLU; IVAU}

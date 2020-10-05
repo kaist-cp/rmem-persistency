@@ -520,6 +520,7 @@ function clause decodeSystem (0b1101010100:[L]:0b01:(bit[3]) op1:(bit[4]) CRn:(b
           case (0b011, 0b1010, 0b001) -> Some(DataCache(t,CVAC))
           case (0b011, 0b1011, 0b001) -> Some(DataCache(t,CVAU))
           case (0b011, 0b1110, 0b001) -> Some(DataCache(t,CIVAC))
+          case (0b011, 0b1100, 0b001) -> Some(DataCache(t,CVAP))
         }
 
     case Sys_IC ->
@@ -557,6 +558,7 @@ function clause execute ( DataCache(t,dc_op) ) =
     case CVAC  -> not_implemented("DC CVAC")
     case CVAU  -> data_cache_operation_CVAU := addr
     case CIVAC -> not_implemented("DC CIVAC")
+    case CVAP  -> DataCacheOperation_CVAP()
   }
 }
 
