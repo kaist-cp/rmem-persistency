@@ -558,7 +558,7 @@ function clause execute ( DataCache(t,dc_op) ) =
     case CVAC  -> not_implemented("DC CVAC")
     case CVAU  -> data_cache_operation_CVAU := addr
     case CIVAC -> not_implemented("DC CIVAC")
-    case CVAP  -> DataCacheOperation_CVAP()
+    case CVAP  -> DataCacheOperation_CVAP(addr)
   }
 }
 

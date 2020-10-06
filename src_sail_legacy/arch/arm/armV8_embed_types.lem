@@ -502,7 +502,7 @@ type PSTATEField = PSTATEField_DAIFSet | PSTATEField_DAIFClr | PSTATEField_SP
 type SystemOp = Sys_AT | Sys_DC | Sys_IC | Sys_TLBI | Sys_SYS
 
 
-type DCOp = IVAC | ISW | CSW | CISW | ZVA | CVAC | CVAU | CIVAC
+type DCOp = IVAC | ISW | CSW | CISW | ZVA | CVAC | CVAU | CIVAC | CVAP
 
 
 type ICOp = IALLUIS | IALLU | IVAU

@@ -577,7 +577,7 @@ function unit effect {barr} DataSynchronizationBarrier((MBReqDomain) domain, (MB
   };
 }
 
-val extern unit -> unit effect {barr} DataCacheOperation_CVAP
+val extern bit[64] -> unit effect {barr} DataCacheOperation_CVAP
 
 (** ENUMERATE:shared/functions/memory/DeviceType *)
 (** ENUMERATE:shared/functions/memory/DeviceType *)

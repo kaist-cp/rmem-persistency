@@ -95,4 +95,5 @@ let duplicate_bits (Vector bits start direction,len) =
   let bits' = repeat bits len in
   Vector bits' start direction
 
+val DataCacheOperation_CVAP : vector bitU -> M unit
 let DataCacheOperation_CVAP (addr) = cache_op Cache_op_D_CVAP addr
