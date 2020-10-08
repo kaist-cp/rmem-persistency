@@ -245,8 +245,8 @@ module DC = struct
   type typ = VA | SW
   let pp_typ = function VA -> "VA" | SW -> "SW"
 
-  type point = CO | U
-  let pp_point = function CO -> "C" | U -> "U"
+  type point = CO | U | P
+  let pp_point = function CO -> "C" | U -> "U" | P -> "P"
 
   type op = { funct:funct; typ:typ; point:point; }
   let pp_op op =

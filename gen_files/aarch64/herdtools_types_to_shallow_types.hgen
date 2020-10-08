@@ -163,6 +163,7 @@ let translate_dCOp _ = function
   | CVAC  -> ArmV8_embed_types.CVAC
   | CVAU  -> ArmV8_embed_types.CVAU
   | CIVAC -> ArmV8_embed_types.CIVAC
+  | CVAP  -> ArmV8_embed_types.CVAP
 
 let translate_iCOp _ = function
   | IALLUIS -> ArmV8_embed_types.IALLUIS

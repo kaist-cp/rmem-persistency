@@ -319,6 +319,7 @@
   "CVAC"  , DCOP (CVAC) ;
   "CVAU"  , DCOP (CVAU) ;
   "CIVAC" , DCOP (CIVAC) ;
+  "CVAP"  , DCOP (CVAP) ;
 
   "IALLUIS" , ICOP (IALLUIS) ;
   "IALLU"   , ICOP (IALLU) ;

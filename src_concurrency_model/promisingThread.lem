@@ -384,6 +384,7 @@ let rec do_local_effs ((ts,(ii,view,o)) : iconf 'i 'v) =
   | O_Fail (Just msg) ->   failwith ("Sail assertion: Fail '" ^ msg ^ "'")
   | O_Fail Nothing ->      failwith ("Sail assertion: Fail")
   | O_Footprint o ->       failwith "footprint recalculation not supported"
+  | O_Cache_op _ _ ->      failwith "Promising: cache op not implemented" (* PMEM_TODO: implement *)
 end
 
 (* stolen from machineDefThreadSubsystem *)

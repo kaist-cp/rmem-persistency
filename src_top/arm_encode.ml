@@ -221,6 +221,7 @@ let actually_SAIL_encode
                 let regt = Nat_big_num.to_int t in
                 let (op1,crm,op2) = (match dcOp with
                     | CVAU -> (3,11,1)
+                    | CVAP -> (3,12,1)
                     | _ -> failwith "unsupported DC operation") in
                 (3574099968
                     lor regt

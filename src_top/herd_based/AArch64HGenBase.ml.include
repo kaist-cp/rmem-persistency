@@ -512,6 +512,7 @@ let pp_dcop op =
   | CVAC  -> "CVAC"
   | CVAU  -> "CVAU"
   | CIVAC -> "CIVAC"
+  | CVAP  -> "CVAP"
 
 let pp_icop op =
   match op with

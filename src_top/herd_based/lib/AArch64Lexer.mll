@@ -227,6 +227,7 @@ match name with
 | "zswc"|"ZSWC" -> A.DC.(DC_OP { funct=Z; typ=SW; point=CO; })
 | "cvau"|"CVAU" -> A.DC.(DC_OP { funct=C; typ=VA; point=U; })
 | "civau"|"CIVAU" -> A.DC.(DC_OP { funct=CI; typ=VA; point=U; })
+| "cvap"|"CVAP" -> A.DC.(DC_OP { funct=C; typ=VA; point=P; })
 | "zvau"|"ZVAU" -> A.DC.(DC_OP { funct=Z; typ=VA; point=U; })
 | "iswu"|"ISWU" -> A.DC.(DC_OP { funct=I; typ=SW; point=U; })
 | "cswu"|"CSWU" -> A.DC.(DC_OP { funct=C; typ=SW; point=U; })

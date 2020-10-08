@@ -257,6 +257,7 @@ function (regfps,regfps,regfps,niafps,diafp,instruction_kind) effect pure initia
         case CVAC  -> not_implemented("DC CVAC")
         case CVAU  -> ik := IK_cache_op(Cache_op_D_CVAU)
         case CIVAC -> not_implemented("DC CIVAC")
+        case CVAP  -> ik := IK_cache_op(Cache_op_D_CVAP)
       }
     }
 
