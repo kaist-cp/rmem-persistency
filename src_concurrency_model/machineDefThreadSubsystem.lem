@@ -856,7 +856,6 @@ let address_from_AArch64_dc_ii (instruction: (instruction_instance 'i)) : maybe 
     | [(_, _, v)] -> address_of_register_value v
     | _ -> Nothing
     end
-  (* PMEM_TODO: implement CVAP case *)
   | _ -> Nothing
   end
 
