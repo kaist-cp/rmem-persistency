@@ -164,6 +164,8 @@ let ensure_read_mem_outcome = function
   | O_Read_mem descr c -> (descr,c) | _ -> fail end
 let ensure_excl_res_outcome = function
   | O_Excl_res c -> c | _ -> fail end
+let ensure_flush_outcome = function
+  | O_Cache_op descr o -> (descr,o) | _ -> fail end
 let ensure_write_reg_outcome = function
   | O_Write_reg descr o -> (descr,o) | _ -> fail end
 let ensure_read_reg_outcome = function

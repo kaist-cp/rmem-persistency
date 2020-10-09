@@ -87,14 +87,17 @@ let init_instruction_info ioid addr opcode i =
 type pts 'i 'v = 
   (* dynamic *)
   <| reg : map reg_base_name register_value
-   ; vReg : map reg_base_name 'v
-   ; vCoh : map address 'v
-   ; vRm  : 'v
-   ; vRp  : 'v
-   ; vWm  : 'v
-   ; vWp  : 'v
-   ; vCAP : 'v
-   ; vRel : 'v
+   ; vReg  : map reg_base_name 'v
+   ; vCoh  : map address 'v
+   ; vRm   : 'v
+   ; vRp   : 'v
+   ; vWm   : 'v
+   ; vWp   : 'v
+   ; vCAP  : 'v
+   ; vRel  : 'v
+   ; vPn   : 'v
+   ; vlPer : map address 'v
+   ; vPer  : map address 'v
    ; fwd_bank : map address (w_eiid * bool * 'v)
    ; xcl_bank : maybe ((w_eiid * address) * 'v) (* v is read exclusive view, for RISCV *)
    ; promises : set (w_eiid * 'v * address * bool) (* bool is whether thread start *)
@@ -313,14 +316,17 @@ let p_initial_thread_state
   let tReg = List.foldl (fun m (n,_) -> Map.insert n bot m) Map.empty ird in
 
   let s = <| reg = reg
-           ; vCoh = vCoh
-           ; vReg = tReg
-           ; vRm  = bot
-           ; vRp  = bot
-           ; vWm  = bot
-           ; vWp  = bot
-           ; vCAP = bot
-           ; vRel = bot
+           ; vCoh  = vCoh
+           ; vReg  = tReg
+           ; vRm   = bot
+           ; vRp   = bot
+           ; vWm   = bot
+           ; vWp   = bot
+           ; vCAP  = bot
+           ; vRel  = bot
+           ; vPn   = bot
+           ; vlPer = vCoh
+           ; vPer  = vCoh
            ; fwd_bank = Map.empty
            ; xcl_bank = Nothing
            ; promises = Set.empty
@@ -384,7 +390,7 @@ let rec do_local_effs ((ts,(ii,view,o)) : iconf 'i 'v) =
   | O_Fail (Just msg) ->   failwith ("Sail assertion: Fail '" ^ msg ^ "'")
   | O_Fail Nothing ->      failwith ("Sail assertion: Fail")
   | O_Footprint o ->       failwith "footprint recalculation not supported"
-  | O_Cache_op _ _ ->      failwith "Promising: cache op not implemented" (* PMEM_TODO: implement *)
+  | O_Cache_op _ _ ->      (ts,(ii,view,o))
 end
 
 (* stolen from machineDefThreadSubsystem *)
@@ -494,8 +500,34 @@ let run_barrier_instruction isa ((s,(ii,view,o)) : iconf 'i 'v)
 
     | _ -> failwith ("cannot handle this barrier: " ^ show bk)
     end in
+  let Pn = match bk with
+    | Barrier_DMB (dom, typ) ->
+        let () = ensure (dom = A64_FullShare || dom = A64_InnerShare) "Barrier domain not supported" in
+        match typ with
+        | A64_barrier_all -> [s.vRm;s.vWm]
+        | _ -> []
+        end
+    | Barrier_DSB (dom, typ) ->
+        let () = ensure (dom = A64_FullShare || dom = A64_InnerShare) "Barrier domain not supported" in
+        match typ with
+        | A64_barrier_all -> [s.vRm;s.vWm]
+        | _ -> []
+        end
+    | _ -> []
+    end in
+  let per = match bk with
+    | Barrier_DSB (dom, typ) ->
+        let () = ensure (dom = A64_FullShare || dom = A64_InnerShare) "Barrier domain not supported" in
+        match typ with
+        | A64_barrier_all -> s.vlPer
+        | _ -> s.vPer
+        end
+    | _ -> s.vPer
+    end in
   let s = <| s with vRp = joinS (s.vRp :: Rp);
-                    vWp = joinS (s.vWp :: Wp); |> in
+                    vWp = joinS (s.vWp :: Wp);
+                    vPn = joinS (s.vPn :: Pn);
+                    vPer = per; |> in
   let (s,(ii,view,o)) = do_local_effs (s,(ii,view,o)) in
   make_plain_transition (finish_non_branch_instruction isa (s,(ii,view,o)))
 
@@ -739,6 +771,21 @@ let run_store_exclusive_instruction params isa
    run_store_instruction params isa (Just rxinfo) (s,(ii,view,c true)) pss_sem pss)
 
 
+let run_flush_instruction isa ((s,(ii,view,o)) : iconf 'i 'v) =
+  let (s,(ii,view,o)) = do_local_effs (s,(ii,view,o)) in
+  let ((cok,addr),o) = ensure_flush_outcome o in
+  let addr = addr_of_addr_lifted addr in
+  let lper = match cok with
+    | Cache_op_D_CVAP ->
+        let v = join (Map.findWithDefault addr bot s.vCoh) s.vPn in
+        inc_vmap s.vlPer addr v
+    | _ -> s.vlPer
+    end in
+  let s = <| s with vlPer = lper; |> in
+  let (s,(ii,view,o)) = do_local_effs (s,(ii,view,o)) in
+  make_plain_transition (finish_non_branch_instruction isa (s,(ii,view,o)))
+
+
 
 let initialise_instruction isa s (addr,opcode,instr) = 
   let o = isa.instruction_semantics.initial_outcome_of_instruction instr in
@@ -771,6 +818,7 @@ let run_instruction
        else run_store_instruction params isa Nothing (s,(ii,view,o)) pss_sem pss
     | O_Barrier _ _ -> run_barrier_instruction isa (s,(ii,view,o))
     | O_Excl_res _ -> run_store_exclusive_instruction params isa (s,(ii,view,o)) pss_sem pss
+    | O_Cache_op _ _ -> run_flush_instruction isa (s,(ii,view,o))
     | _ -> fail
     end
 
