@@ -87,17 +87,17 @@ let init_instruction_info ioid addr opcode i =
 type pts 'i 'v = 
   (* dynamic *)
   <| reg : map reg_base_name register_value
-   ; vReg  : map reg_base_name 'v
-   ; vCoh  : map address 'v
-   ; vRm   : 'v
-   ; vRp   : 'v
-   ; vWm   : 'v
-   ; vWp   : 'v
-   ; vCAP  : 'v
-   ; vRel  : 'v
-   ; vPn   : 'v
-   ; vlPer : map address 'v
-   ; vPer  : map address 'v
+   ; vReg     : map reg_base_name 'v
+   ; vCoh     : map address 'v
+   ; vRm      : 'v
+   ; vRp      : 'v
+   ; vWm      : 'v
+   ; vWp      : 'v
+   ; vCAP     : 'v
+   ; vRel     : 'v
+   ; vPReady  : 'v
+   ; vPAsync  : map address 'v
+   ; vPCommit : map address 'v
    ; fwd_bank : map address (w_eiid * bool * 'v)
    ; xcl_bank : maybe ((w_eiid * address) * 'v) (* v is read exclusive view, for RISCV *)
    ; promises : set (w_eiid * 'v * address * bool) (* bool is whether thread start *)
@@ -316,17 +316,17 @@ let p_initial_thread_state
   let tReg = List.foldl (fun m (n,_) -> Map.insert n bot m) Map.empty ird in
 
   let s = <| reg = reg
-           ; vCoh  = vCoh
-           ; vReg  = tReg
-           ; vRm   = bot
-           ; vRp   = bot
-           ; vWm   = bot
-           ; vWp   = bot
-           ; vCAP  = bot
-           ; vRel  = bot
-           ; vPn   = bot
-           ; vlPer = vCoh
-           ; vPer  = vCoh
+           ; vCoh     = vCoh
+           ; vReg     = tReg
+           ; vRm      = bot
+           ; vRp      = bot
+           ; vWm      = bot
+           ; vWp      = bot
+           ; vCAP     = bot
+           ; vRel     = bot
+           ; vPReady  = bot
+           ; vPAsync  = vCoh
+           ; vPCommit = vCoh
            ; fwd_bank = Map.empty
            ; xcl_bank = Nothing
            ; promises = Set.empty
@@ -500,7 +500,7 @@ let run_barrier_instruction isa ((s,(ii,view,o)) : iconf 'i 'v)
 
     | _ -> failwith ("cannot handle this barrier: " ^ show bk)
     end in
-  let Pn = match bk with
+  let p_ready = match bk with
     | Barrier_DMB (dom, typ) ->
         let () = ensure (dom = A64_FullShare || dom = A64_InnerShare) "Barrier domain not supported" in
         match typ with
@@ -515,19 +515,19 @@ let run_barrier_instruction isa ((s,(ii,view,o)) : iconf 'i 'v)
         end
     | _ -> []
     end in
-  let per = match bk with
+  let p_commit = match bk with
     | Barrier_DSB (dom, typ) ->
         let () = ensure (dom = A64_FullShare || dom = A64_InnerShare) "Barrier domain not supported" in
         match typ with
-        | A64_barrier_all -> s.vlPer
-        | _ -> s.vPer
+        | A64_barrier_all -> s.vPAsync
+        | _ -> s.vPCommit
         end
-    | _ -> s.vPer
+    | _ -> s.vPCommit
     end in
-  let s = <| s with vRp = joinS (s.vRp :: Rp);
-                    vWp = joinS (s.vWp :: Wp);
-                    vPn = joinS (s.vPn :: Pn);
-                    vPer = per; |> in
+  let s = <| s with vRp     = joinS (s.vRp :: Rp);
+                    vWp     = joinS (s.vWp :: Wp);
+                    vPReady  = joinS (s.vPReady :: p_ready);
+                    vPCommit = p_commit; |> in
   let (s,(ii,view,o)) = do_local_effs (s,(ii,view,o)) in
   make_plain_transition (finish_non_branch_instruction isa (s,(ii,view,o)))
 
@@ -775,13 +775,13 @@ let run_flush_instruction isa ((s,(ii,view,o)) : iconf 'i 'v) =
   let (s,(ii,view,o)) = do_local_effs (s,(ii,view,o)) in
   let ((cok,addr),o) = ensure_flush_outcome o in
   let addr = addr_of_addr_lifted addr in
-  let lper = match cok with
+  let p_async = match cok with
     | Cache_op_D_CVAP ->
-        let v = join (Map.findWithDefault addr bot s.vCoh) s.vPn in
-        inc_vmap s.vlPer addr v
-    | _ -> s.vlPer
+        let v = join (Map.findWithDefault addr bot s.vCoh) s.vPReady in
+        inc_vmap s.vPAsync addr v
+    | _ -> s.vPAsync
     end in
-  let s = <| s with vlPer = lper; |> in
+  let s = <| s with vPAsync = p_async; |> in
   let (s,(ii,view,o)) = do_local_effs (s,(ii,view,o)) in
   make_plain_transition (finish_non_branch_instruction isa (s,(ii,view,o)))
 
