@@ -69,6 +69,8 @@ module type S = sig
             
   val pp_state : symbol_table -> state -> string
 
+  val pp_nvm : symbol_table -> memory_snapshot -> string
+
 (* Check state *)
   val check_prop : prop -> state -> bool
   val check_filter : prop -> state -> bool
@@ -238,6 +240,27 @@ module Make : S =
           mem
       in
       String.concat "" (reg_strings @ mem_strings)
+
+    let pp_nvm symtab mem =
+      let mem_strings =
+        List.map
+          (fun ((a,_), mv) ->
+            let astr = try List.assoc a symtab with Not_found -> Int64.to_string a in
+            let mvstr =
+              if Nat_big_num.less_equal mv (Nat_big_num.of_int64 Int64.max_int) &&
+                  Nat_big_num.less_equal (Nat_big_num.of_int64 Int64.min_int) mv
+              then
+                Nat_big_num.to_int64 mv
+                |> pp_val symtab
+              else if !Globals.print_hex then
+                "0x" ^ Misc_extra.big_num_to_hex_string mv
+              else
+                Nat_big_num.to_string mv
+            in
+            Printf.sprintf "%s=%s; " astr mvstr)
+          mem
+      in
+      String.concat "" mem_strings
 
 
 

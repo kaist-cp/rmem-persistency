@@ -2437,11 +2437,29 @@ let print_observations interact_state search_state =
   let deadlock_states_output = print_observed_deadlocks interact_state search_state.Runner.observed_deadlocks in
   let exceptions_output = print_observed_exceptions interact_state search_state.Runner.observed_exceptions in
 
+  let nvms_output =
+    let symtab =
+      List.map
+      (fun ((addr, _), s) -> (Test.C.sail_address_to_address addr, s))
+      interact_state.ppmode.Globals.pp_symbol_table
+    in
+    let nvm_header = SO.strLine "NVM States" in
+    let nvm_states =
+      SO.Concat
+        (List.map
+          (fun mem -> SO.Line (SO.String (Test.C.pp_nvm symtab mem)))
+          (List.map (fun ((_, mem), _) -> mem) (Runner.StateMap.bindings search_state.Runner.observed_filterred_finals)))
+          (* search_state.Runner.observed_final_nvms) *)
+    in
+    SO.Concat [nvm_header; nvm_states]
+  in
+
   SO.Concat
     [ branch_targets_output;
       shared_memory_output;
       memory_writes_output;
       states_output;
+      nvms_output;
       deadlock_states_output;
       exceptions_output;
     ]
