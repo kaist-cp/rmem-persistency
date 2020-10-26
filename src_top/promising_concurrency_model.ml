@@ -212,13 +212,37 @@ module Make (ISAModel: Isa_model.S) :
     then make_postcondition_filters test_info
     else []
 
+
+
   let possible_final_nvm_values (s: state):
     (Sail_impl_base.footprint * (Sail_impl_base.memory_value list)) list =
       []
 
+  let rec flatten_one fp vals acc =
+    List.concat (List.map (fun v -> List.map (fun l -> (fp, v) :: l) acc) vals)
+
+  let rec flatten_nvm_values_aux
+    (values: (Sail_impl_base.footprint * (Sail_impl_base.memory_value list)) list) acc =
+    match values with
+    | (fp, vals) :: values -> flatten_one fp vals (flatten_nvm_values_aux values acc)
+    | [] -> acc
+
+  let rec remove_dup (vals: Sail_impl_base.memory_value list) =
+    match vals with
+    | v :: vals ->
+        (match List.find_opt (fun v' -> v' = v) vals with
+        | Some _ -> remove_dup vals
+        | None -> v :: (remove_dup vals))
+    | [] -> []
+
+  let flatten_nvm_values
+    (values: (Sail_impl_base.footprint * (Sail_impl_base.memory_value list)) list) =
+    let values' = List.map (fun (fp, vl) -> (fp, remove_dup vl)) values in
+    flatten_nvm_values_aux values' [[]]
+
   let possible_final_nvm_states s =
     let values = possible_final_nvm_values s in
-    []
+    flatten_nvm_values values
 
 end
 
