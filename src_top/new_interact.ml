@@ -2447,7 +2447,7 @@ let print_observations interact_state search_state =
     let nvm_states =
       SO.Concat
         (List.map
-          (fun mem -> SO.Line (SO.String (Test.C.pp_nvm symtab mem)))
+          (fun mem -> SO.Line (SO.String (Test.C.pp_nvm_state symtab mem)))
           (List.map (fun ((_, mem), _) -> mem) (Runner.StateMap.bindings search_state.Runner.observed_filterred_finals)))
           (* search_state.Runner.observed_final_nvms) *)
     in

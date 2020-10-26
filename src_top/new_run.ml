@@ -124,7 +124,7 @@ type search_state =
     observed_shared_memory:  Sail_impl_base.footprint Pset.set;
 
     (* final nvm states *)
-    observed_final_nvms: Test.C.memory_snapshot list;
+    observed_final_nvm_states: Test.C.memory_snapshot list;
 
     (*** statistics ***)
 
@@ -1023,7 +1023,7 @@ let search_from_state
       observed_modified_locations = (ConcModel.model_params system_state).t.thread_modified_code_footprints;
       observed_shared_memory  = options.eager_mode.em_shared_memory;
 
-      observed_final_nvms = [];
+      observed_final_nvm_states = [];
 
       (* statistics *)
       started_timestamp      = started_timestamp;

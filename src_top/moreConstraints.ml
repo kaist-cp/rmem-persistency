@@ -69,7 +69,7 @@ module type S = sig
             
   val pp_state : symbol_table -> state -> string
 
-  val pp_nvm : symbol_table -> memory_snapshot -> string
+  val pp_nvm_state : symbol_table -> memory_snapshot -> string
 
 (* Check state *)
   val check_prop : prop -> state -> bool
@@ -241,7 +241,7 @@ module Make : S =
       in
       String.concat "" (reg_strings @ mem_strings)
 
-    let pp_nvm symtab mem =
+    let pp_nvm_state symtab mem =
       let mem_strings =
         List.map
           (fun ((a,_), mv) ->
