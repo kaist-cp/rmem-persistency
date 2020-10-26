@@ -634,6 +634,14 @@ let p_shared_memory_of_state _ : set footprint = Set.empty
 let p_modified_code_locations_of_state _ : set footprint = Set.empty
 
 
+let p_possible_final_nvm_values (s: p_state 'i (pts 'i t) pss t) = []
+(* PMEM_TODO: implement
+   - join every thread's vPCommit
+   - get shared locations from model_params
+   - use PromisingStorage.pss_possible_read_writes to find possible nvm values for each shared locations
+ *)
+
+
 (* To easier refer to these in OCaml .. *)
 let type_specialised_p_pst_of_state (s : p_state 'i (pts 'i t) pss t) = pst_of_state s
 let type_specialised_p_is_final_state (s : p_state 'i (pts 'i t) pss t) = p_is_final_state s
