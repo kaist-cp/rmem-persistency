@@ -107,3 +107,19 @@ let reduced_final_mem_state
       in
       ((int64_addr, size), big_value))
     memory_values 
+
+let reduced_final_nvm_state
+      (memory_values: (Sail_impl_base.footprint * Sail_impl_base.memory_value) list) = 
+  List.map
+    (fun ((addr, size), value) ->
+      let int64_addr = C.sail_address_to_address addr in
+      let big_value =
+        match Sail_impl_base.integer_of_memory_value (Globals.get_endianness ()) value with
+        | Some bi -> bi
+        | None -> failwith "bad final memory value"
+      in
+      ((int64_addr, size), big_value))
+    memory_values 
+
+let reduced_final_nvm_states nvm_states =
+  List.map reduced_final_nvm_state nvm_states

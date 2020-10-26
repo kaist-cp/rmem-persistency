@@ -212,6 +212,14 @@ module Make (ISAModel: Isa_model.S) :
     then make_postcondition_filters test_info
     else []
 
+  let possible_final_nvm_values (s: state):
+    (Sail_impl_base.footprint * (Sail_impl_base.memory_value list)) list =
+      []
+
+  let possible_final_nvm_states s =
+    let values = possible_final_nvm_values s in
+    []
+
 end
 
 (********************************************************************)

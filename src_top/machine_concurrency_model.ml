@@ -256,6 +256,8 @@ module Make
   let inst_restarted s = s.sst_inst_restarted
 
   let filters _ _ = []
+
+  let possible_final_nvm_states _ = []
 end
 
 

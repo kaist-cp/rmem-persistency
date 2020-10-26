@@ -60,6 +60,10 @@ module type S = sig
   val final_reg_states :
     state -> (Events.thread_id * (Sail_impl_base.reg_base_name * Sail_impl_base.register_value option) list) list
 
+  val possible_final_nvm_states :
+    state ->
+    ((Sail_impl_base.footprint * Sail_impl_base.memory_value) list) list
+
   val make_cex_candidate :
     state ->
     instruction_ast CandidateExecution.cex_candidate

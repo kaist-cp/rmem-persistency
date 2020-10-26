@@ -393,6 +393,11 @@ let record_final_state target search_state search_node : search_state =
   else if ConcModel.is_final_state search_node.system_state then
     let final_state = reduced_final_state search_state.test_info.Test.show_regs search_state.test_info.Test.show_mem search_node.system_state in
 
+    let final_nvm_states = 
+      let raw_nvm_states = ConcModel.possible_final_nvm_states search_node.system_state in
+      Test.reduced_final_nvm_states raw_nvm_states
+    in
+
     let observed_finals =
       let (choices, count) =
         match StateMap.find final_state search_state.observed_finals with
@@ -426,6 +431,8 @@ let record_final_state target search_state search_node : search_state =
     { search_state with
       observed_finals = observed_finals;
       observed_filterred_finals = observed_filterred_finals;
+      (* TODO: remove duplication *)
+      observed_final_nvm_states = final_nvm_states @ search_state.observed_final_nvm_states;
     }
   else
     match search_state.observed_deadlocks with
