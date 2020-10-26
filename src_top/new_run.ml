@@ -431,7 +431,7 @@ let record_final_state target search_state search_node : search_state =
     { search_state with
       observed_finals = observed_finals;
       observed_filterred_finals = observed_filterred_finals;
-      (* TODO: remove duplication *)
+      (* PMEM_TODO: remove duplication *)
       observed_final_nvm_states = final_nvm_states @ search_state.observed_final_nvm_states;
     }
   else

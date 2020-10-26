@@ -216,6 +216,7 @@ module Make (ISAModel: Isa_model.S) :
 
   let possible_final_nvm_values (s: state):
     (Sail_impl_base.footprint * (Sail_impl_base.memory_value list)) list =
+      (* PMEM_TODO: implement in promising.lem *)
       []
 
   let rec flatten_one fp vals acc =
