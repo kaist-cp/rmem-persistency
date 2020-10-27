@@ -634,12 +634,47 @@ let p_shared_memory_of_state _ : set footprint = Set.empty
 let p_modified_code_locations_of_state _ : set footprint = Set.empty
 
 
-let p_possible_final_nvm_values (s: p_state 'i (pts 'i t) pss t) = []
-(* PMEM_TODO: implement
-   - join every thread's vPCommit
-   - get shared locations from model_params
-   - use PromisingStorage.pss_possible_read_writes to find possible nvm values for each shared locations
- *)
+let join_vmap vmap1 vmap2 =
+  Map.mapi
+    (fun addr v1 -> join v1 (Map.findWithDefault addr bot vmap2))
+    vmap1
+
+let rec shared_locations_from_memory params mem acc: list footprint =
+  match mem with
+  | [] -> acc
+  | (w, _, _) :: mem ->
+    if in_shared_memory params w.w_addr
+    then
+      let acc' = if List.elem w.w_addr acc then acc else w.w_addr :: acc in
+      shared_locations_from_memory params mem acc'
+    else shared_locations_from_memory params mem acc
+  end
+
+let possible_final_nvm_values_aux fp v memory: list write =
+  let addr_writes = [(w,t) | forall ((w,t,_) MEM memory)
+                           | sub_footprint fp w.w_addr] in
+  let (after,before) = splitWhile (fun (w,wt) -> wt > v) addr_writes in
+  let ws = match before with
+  | w::ws -> w :: after
+  | [] -> after
+  end in
+  List.map (fun (w, wt) -> w) ws
+
+let p_possible_final_nvm_values (s: p_state 'i (pts 'i t) pss t) =
+  let p_commit =
+    Map_extra.fold
+      (fun _ ts v -> join_vmap ts.vPCommit v)
+      s.p_thread_states
+      Map.empty
+  in
+  let memory = s.p_storage_state.pss_memory in
+  let footprints = shared_locations_from_memory s.p_model memory [] in
+  List.map
+    (fun (addr, sz) ->
+       let l = possible_final_nvm_values_aux
+                 (addr, sz) (Map.findWithDefault addr bot p_commit) memory in
+       ((addr, sz), List.map (fun w -> Maybe.fromMaybe [] w.w_value) l))
+    footprints
 
 
 (* To easier refer to these in OCaml .. *)

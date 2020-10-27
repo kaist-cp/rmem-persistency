@@ -2443,13 +2443,13 @@ let print_observations interact_state search_state =
       (fun ((addr, _), s) -> (Test.C.sail_address_to_address addr, s))
       interact_state.ppmode.Globals.pp_symbol_table
     in
-    let nvm_header = SO.strLine "NVM States" in
+    let nvm_header = SO.strLine "NVM States %i" (List.length search_state.Runner.observed_final_nvm_states) in
     let nvm_states =
       SO.Concat
         (List.map
           (fun mem -> SO.Line (SO.String (Test.C.pp_nvm_state symtab mem)))
-          (List.map (fun ((_, mem), _) -> mem) (Runner.StateMap.bindings search_state.Runner.observed_filterred_finals)))
-          (* PMEM_TODO: search_state.Runner.observed_final_nvms) *)
+          (* (List.map (fun ((_, mem), _) -> mem) (Runner.StateMap.bindings search_state.Runner.observed_filterred_finals))) *)
+          search_state.Runner.observed_final_nvm_states)
     in
     SO.Concat [nvm_header; nvm_states]
   in
