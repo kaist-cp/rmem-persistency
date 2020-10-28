@@ -439,8 +439,7 @@ let record_final_state target search_state search_node : search_state =
 
     let final_nvm_states = 
       let raw_nvm_states = ConcModel.possible_final_nvm_states search_node.system_state in
-      let nvm_states = Test.reduced_final_nvm_states raw_nvm_states in
-      List.map (fun l -> List.sort (fun (fp1, _) (fp2, _) -> Stdlib.compare fp1 fp2) l) nvm_states
+      Test.reduced_final_nvm_states raw_nvm_states
     in
     let update_nvm_state nvm nvm_map =
       let count =

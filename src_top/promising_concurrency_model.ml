@@ -216,7 +216,8 @@ module Make (ISAModel: Isa_model.S) :
 
   let possible_final_nvm_values (s: state):
     (Sail_impl_base.footprint * (Sail_impl_base.memory_value list)) list =
-    Promising.p_possible_final_nvm_values s.Promising.pst_state
+    let nvms = Promising.p_possible_final_nvm_values s.Promising.pst_state in
+    List.sort (fun (fp1, _) (fp2, _) -> Stdlib.compare fp1 fp2) nvms
 
   let rec flatten_one fp vals acc =
     List.concat (List.map (fun v -> List.map (fun l -> (fp, v) :: l) acc) vals)
