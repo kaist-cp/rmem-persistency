@@ -43,6 +43,7 @@ type p_state 'i 'ts 'ss 'v =
   <| p_program_memory:        (address -> fetch_and_decode_outcome 'i);
      p_initial_writes:        list write;
      p_thread_states:         map thread_id 'ts;
+     p_shared_locations:      list footprint;
      p_storage_state:         'ss;
      p_model:                 model_params;
      p_isa:                   isa 'i;
@@ -56,6 +57,18 @@ type p_state 'i 'ts 'ss 'v =
 
 
 (* type pts' 'i = pts 'i t *)
+
+let rec shared_locations_of_footprint params (addr, sz) =
+  if sz <= 8
+  then
+    let fp = (addr, sz) in
+    if in_shared_memory params fp then [fp] else []
+  else
+    let fp = (addr, 8) in
+    let fp' = (add_address_nat addr 8, sz - 8) in
+    if in_shared_memory params fp
+    then fp :: shared_locations_of_footprint params fp'
+    else shared_locations_of_footprint params fp'
 
 let p_initial_state
     (register_data:           registerdata)
@@ -87,12 +100,20 @@ let p_initial_state
       state_record.isr_thread_ids
   in
 
+  let shared_locations =
+    List.concat
+      (List.map
+        (fun w -> shared_locations_of_footprint state_record.isr_params w.w_addr)
+        state_record.isr_memory)
+  in
+
   <| p_program_memory    = prog;
      p_initial_writes    = state_record.isr_memory;
      p_thread_states     = Map.fromList initial_thread_states;
      p_storage_state     = PromisingStorage.pss_initial_state
                              threads_active
                              state_record.isr_memory;
+     p_shared_locations  = shared_locations;
      p_model             = state_record.isr_params;
      p_isa = state_record.isr_isa;
      p_stopped_promising = false;
@@ -639,25 +660,16 @@ let join_vmap vmap1 vmap2 =
     (fun addr v1 -> join v1 (Map.findWithDefault addr bot vmap2))
     vmap1
 
-let rec shared_locations_from_memory params mem acc: list footprint =
-  match mem with
-  | [] -> acc
-  | (w, _, _) :: mem ->
-    if in_shared_memory params w.w_addr
-    then
-      let acc' = if List.elem w.w_addr acc then acc else w.w_addr :: acc in
-      shared_locations_from_memory params mem acc'
-    else shared_locations_from_memory params mem acc
-  end
-
 let possible_final_nvm_values_aux fp v memory: list write =
   let addr_writes = [(w,t) | forall ((w,t,_) MEM memory)
                            | sub_footprint fp w.w_addr] in
   let (after,before) = splitWhile (fun (w,wt) -> wt > v) addr_writes in
   let ws = match before with
-  | w::ws -> w :: after
-  | [] -> after
-  end in
+    | w::ws -> w :: after
+    | [] -> after
+    end
+  in
+  let () = ensure (ws <> []) "no write to read from found" in
   List.map (fun (w, wt) -> w) ws
 
 let p_possible_final_nvm_values (s: p_state 'i (pts 'i t) pss t) =
@@ -668,12 +680,17 @@ let p_possible_final_nvm_values (s: p_state 'i (pts 'i t) pss t) =
       Map.empty
   in
   let memory = s.p_storage_state.pss_memory in
-  let footprints = shared_locations_from_memory s.p_model memory [] in
+  let footprints = s.p_shared_locations in
   List.map
     (fun (addr, sz) ->
-       let l = possible_final_nvm_values_aux
-                 (addr, sz) (Map.findWithDefault addr bot p_commit) memory in
-       ((addr, sz), List.map (fun w -> Maybe.fromMaybe [] w.w_value) l))
+      let l = possible_final_nvm_values_aux
+                (addr, sz) (Map.findWithDefault addr bot p_commit) memory in
+      let value_of fp w =
+        let mrs = ensure_just (mrs_from_writes fp [write_with_complete_slice w])
+                    "p_possible_final_nvm_values" in
+        mrs.mrs_value
+      in
+      ((addr, sz), List.map (fun w -> value_of (addr, sz) w) l))
     footprints
 
 
