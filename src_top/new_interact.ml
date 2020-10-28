@@ -962,6 +962,22 @@ let print_observed_finals interact_state observed_finals : SO.t =
 
   SO.Concat [states_count_output; states_output]
 
+let print_observed_final_nvm_states interact_state observed_final_nvm_states: SO.t =
+  let symtab =
+    List.map
+    (fun ((addr, _), s) -> (Test.C.sail_address_to_address addr, s))
+    interact_state.ppmode.Globals.pp_symbol_table
+  in
+  let nvm_header = SO.strLine "NVM States %i" (Runner.NVMMap.cardinal observed_final_nvm_states) in
+  let nvm_states =
+    SO.Concat
+      (List.map
+        (fun (nvm, count) ->
+          SO.Line (SO.String (Test.C.pp_nvm_state symtab nvm)))
+        (Runner.NVMMap.bindings observed_final_nvm_states))
+  in
+  SO.Concat [nvm_header; nvm_states]
+
 let print_observed_deadlocks interact_state observed_deadlocks : SO.t =
   match observed_deadlocks with
   | Some (deadlock_choices, deadlock_count) ->
@@ -2434,25 +2450,9 @@ let print_observations interact_state search_state =
   in
 
   let states_output = print_observed_finals interact_state search_state.Runner.observed_filterred_finals in
+  let nvms_output = print_observed_final_nvm_states interact_state search_state.Runner.observed_final_nvm_states in
   let deadlock_states_output = print_observed_deadlocks interact_state search_state.Runner.observed_deadlocks in
   let exceptions_output = print_observed_exceptions interact_state search_state.Runner.observed_exceptions in
-
-  let nvms_output =
-    let symtab =
-      List.map
-      (fun ((addr, _), s) -> (Test.C.sail_address_to_address addr, s))
-      interact_state.ppmode.Globals.pp_symbol_table
-    in
-    let nvm_header = SO.strLine "NVM States %i" (List.length search_state.Runner.observed_final_nvm_states) in
-    let nvm_states =
-      SO.Concat
-        (List.map
-          (fun mem -> SO.Line (SO.String (Test.C.pp_nvm_state symtab mem)))
-          (* (List.map (fun ((_, mem), _) -> mem) (Runner.StateMap.bindings search_state.Runner.observed_filterred_finals))) *)
-          search_state.Runner.observed_final_nvm_states)
-    in
-    SO.Concat [nvm_header; nvm_states]
-  in
 
   SO.Concat
     [ branch_targets_output;

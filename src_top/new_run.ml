@@ -51,6 +51,20 @@ module StateMap = Map.Make(struct
     end
 end)
 
+module NVMMap = Map.Make(struct
+  type t = Test.C.memory_snapshot
+  let compare m1 m2 =
+    let cmp (footprint1, value1) (footprint2, value2) = fun () ->
+      begin match Stdlib.compare footprint1 footprint2 with
+      | 0 -> Nat_big_num.compare value1 value2
+      | c -> c
+      end
+    in
+    try Model_aux.cmps (List.map2 cmp m1 m2) with
+    | Invalid_argument _ -> if List.length m1 > List.length m2 then 1 else -1
+end)
+
+
 module ExceptionMap = Map.Make(struct
   type t = Events.thread_id * Events.ioid * (ConcModel.instruction_ast ExceptionTypes.exception_type)
   let compare (tid1, ioid1, e1) (tid2, ioid2, e2) =
@@ -124,7 +138,7 @@ type search_state =
     observed_shared_memory:  Sail_impl_base.footprint Pset.set;
 
     (* final nvm states *)
-    observed_final_nvm_states: Test.C.memory_snapshot list;
+    observed_final_nvm_states: int NVMMap.t;
 
     (*** statistics ***)
 
@@ -393,11 +407,6 @@ let record_final_state target search_state search_node : search_state =
   else if ConcModel.is_final_state search_node.system_state then
     let final_state = reduced_final_state search_state.test_info.Test.show_regs search_state.test_info.Test.show_mem search_node.system_state in
 
-    let final_nvm_states = 
-      let raw_nvm_states = ConcModel.possible_final_nvm_states search_node.system_state in
-      Test.reduced_final_nvm_states raw_nvm_states
-    in
-
     let observed_finals =
       let (choices, count) =
         match StateMap.find final_state search_state.observed_finals with
@@ -428,11 +437,30 @@ let record_final_state target search_state search_node : search_state =
         search_state.observed_filterred_finals
     in
 
+    let final_nvm_states = 
+      let raw_nvm_states = ConcModel.possible_final_nvm_states search_node.system_state in
+      let nvm_states = Test.reduced_final_nvm_states raw_nvm_states in
+      List.map (fun l -> List.sort (fun (fp1, _) (fp2, _) -> Stdlib.compare fp1 fp2) l) nvm_states
+    in
+    let update_nvm_state nvm nvm_map =
+      let count =
+        match NVMMap.find nvm nvm_map with
+        | count -> count + 1
+        | exception Not_found -> 1
+      in
+      NVMMap.add nvm count nvm_map
+    in
+    let observed_final_nvm_states =
+      List.fold_left
+        (fun m nvm -> update_nvm_state nvm m)
+        search_state.observed_final_nvm_states
+        final_nvm_states
+    in
+
     { search_state with
       observed_finals = observed_finals;
       observed_filterred_finals = observed_filterred_finals;
-      (* PMEM_TODO: remove duplication *)
-      observed_final_nvm_states = final_nvm_states @ search_state.observed_final_nvm_states;
+      observed_final_nvm_states = observed_final_nvm_states;
     }
   else
     match search_state.observed_deadlocks with
@@ -1030,7 +1058,7 @@ let search_from_state
       observed_modified_locations = (ConcModel.model_params system_state).t.thread_modified_code_footprints;
       observed_shared_memory  = options.eager_mode.em_shared_memory;
 
-      observed_final_nvm_states = [];
+      observed_final_nvm_states = NVMMap.empty;
 
       (* statistics *)
       started_timestamp      = started_timestamp;
