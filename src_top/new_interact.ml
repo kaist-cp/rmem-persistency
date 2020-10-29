@@ -973,7 +973,9 @@ let print_observed_final_nvm_states interact_state observed_final_nvm_states: SO
     SO.Concat
       (List.map
         (fun (nvm, count) ->
-          SO.Line (SO.String (Test.C.pp_nvm_state symtab nvm)))
+          SO.Line (SO.Concat [
+            SO.strVerbose SO.Normal "%-6d%s>" count ":";
+            SO.String (Test.C.pp_nvm_state symtab nvm)]))
         (Runner.NVMMap.bindings observed_final_nvm_states))
   in
   SO.Concat [nvm_header; nvm_states]
