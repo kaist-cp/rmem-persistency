@@ -914,3 +914,4 @@ let is_final_tstate params (s : pts 'i 'v) : bool =
   isJust s.raised_exception ||
   (Set.null s.promises && s.cia = Just s.retAddr)
 
+let no_promise (s: pts 'i 'v): bool = Set.null s.promises

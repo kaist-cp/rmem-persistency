@@ -306,7 +306,7 @@ let rec enumerate_possible_final_states_aux
   match todo with
   | [] -> List.reverse traces_found
   | (inv_trace_so_far, pts, pss) :: todo ->
-     if is_final_tstate params.t pts
+     if no_promise pts
      then
        let traces_found' = (pts,pss,List.reverse inv_trace_so_far) :: traces_found in
        enumerate_possible_final_states_aux params isa pss_sem traces_found' todo
@@ -372,7 +372,7 @@ let enumerate_finalise_transitions
       (state : p_state 'i (pts 'i 'v) 'pss 'v)
     : list (p_trans 'i (pts 'i 'v) 'pss 'v)
   = 
-  if Map.all (fun _ ts -> is_final_tstate state.p_model.t ts) state.p_thread_states
+  if Map.all (fun _ ts -> no_promise ts) state.p_thread_states
   then []
   else
     let pss = state.p_storage_state in
@@ -431,12 +431,7 @@ let p_normally_enumerate_transitions
 
   let can_stop_promising = 
     not state.p_stopped_promising &&
-    state.p_model.t.p_promise_first &&
-    Map.all (fun tid trs ->
-        let ts = Map_extra.find tid state.p_thread_states in
-        is_final_tstate state.p_model.t ts || 
-          List.any snd trs)
-      map_thread_transitions
+    state.p_model.t.p_promise_first
   in
 
   let filter (tr,cert_no_write) = 
@@ -553,7 +548,7 @@ let p_is_final_state (s : p_state 'i (pts 'i 'v) 'pss 'v) : bool =
   s.p_model.t.p_promise_first --> s.p_stopped_promising &&
   (* quantify over list rather than set to avoid needing set type for thread states *)
   (forall ((_,ts) MEM (Map_extra.toList s.p_thread_states)).
-   PromisingThread.is_final_tstate s.p_model.t ts)
+   PromisingThread.no_promise ts)
 
 
 
