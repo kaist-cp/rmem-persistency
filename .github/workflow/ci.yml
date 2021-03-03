@@ -1,0 +1,42 @@
+name: Main workflow
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - '**'
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+        ocaml-version:
+          - 4.10.1
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Use OCaml ${{ matrix.ocaml-version }}
+        uses: avsm/setup-ocaml@v1
+        with:
+          ocaml-version: ${{ matrix.ocaml-version }}
+
+      - run: sudo apt-get install -y findutils libgmp-dev m4 perl pkg-config zlib1g-dev z3
+
+      - run: opam repository add rems https://github.com/rems-project/opam-repository.git#opam2
+
+      - run: opam install --deps-only .
+
+      - run: eval $(opam env)
+
+      - run: ulimit -s unlimited
+
+      - run: make MODE=opt ISA=AArch64
