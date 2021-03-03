@@ -1,0 +1,24 @@
+AArch64 fob
+{
+  int64_t X = 0;
+  int64_t Y = 0;
+  int64_t Z = 0;
+
+  0:X0 = X;
+  0:X1 = Y;
+  0:X2 = 1;
+
+  1:X0 = X;
+  1:X1 = Y;
+  1:X2 = Z;
+}
+
+P0 | P1;
+
+STR X2, [X0]    |  LDR X3, [X1]    ;
+DMB SY          |  DMB SY          ;
+STR X2, [X1]    |  DC CVAP, X0     ;
+                |  DSB SY          ;
+                |  STR X3, [X2]    ;
+
+exists (X=0 /\ Y=0 /\ Z=0)

@@ -1,0 +1,59 @@
+AArch64 atomic
+{
+  int64_t X = 0;
+  int64_t Y = 0;
+  int64_t Z = 0;
+  int64_t lock = 0;
+
+  0:X0 = lock;
+  0:X1 = X;
+  0:X2 = Y;
+  0:X3 = Z;
+  0:X4 = 0;
+  0:X5 = 1;
+
+  1:X0 = lock;
+  1:X1 = X;
+  1:X2 = Y;
+  1:X3 = Z;
+  1:X4 = 0;
+  1:X5 = 1;
+}
+
+P0 | P1;
+
+  LDAXR X6, [X0]     |;
+  CMP X6, X4         |;
+  B.NE TO_DEAD       |;
+  STXR W7, X5, [X0]  |;
+  CBNZ W7, TO_DEAD   |;
+  STR X5, [X1]       |;
+  STR X5, [X2]       |;
+  DC CVAP, X1        |;
+  DSB SY             |;
+  DC CVAP, X2        |;
+  DSB SY             |;
+  STLR X4, [X0]      |;
+  B TO_END           |;
+TO_DEAD:             |;
+  MOV X30, #1        |;
+TO_END:              |;
+|  LDAXR X6, [X0]     ;
+|  CMP X6, X4         ;
+|  B.NE TO_DEAD       ;
+|  STXR W7, X5, [X0]  ;
+|  CBNZ W7, TO_DEAD   ;
+|  LDR X8, [X1]       ;
+|  CMP X8, X5         ;
+|  B.NE UNLOCK        ;
+|  STR X5, [X3]       ;
+|  DC CVAP, X3        ;
+|  DSB SY             ;
+|UNLOCK:              ;
+|  STLR X4, [X0]      ;
+|  B TO_END           ;
+|TO_DEAD:             ;
+|  MOV X30, #1        ;
+|TO_END:              ;
+
+exists (0:X30=0 /\ 1:X30=0 /\lock=0 /\ X=0 /\ Y = 0 /\ Z = 0)

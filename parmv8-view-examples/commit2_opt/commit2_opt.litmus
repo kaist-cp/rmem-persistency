@@ -1,0 +1,22 @@
+AArch64 commit2_opt
+{
+  int64_t data = 0;
+  int64_t commit = 0;
+
+  0:X0 = data;
+  0:X1 = 42;
+  1:X0 = data;
+  1:X1 = commit;
+  1:X2 = 1;
+}
+
+P0 | P1;
+
+STR X1, [X0]    |   LDR X3, [X0]    ;
+                |   CMP X3, #0      ;
+                |   B.EQ L          ;
+                |   DC CVAP, X0     ; 
+                |   STR X2, [X1]    ;
+                | L:                ;
+
+exists (data=0 /\ commit=0)

@@ -1,0 +1,17 @@
+AArch64 commit_weak
+{
+  int64_t data = 0;
+  int64_t commit = 0;
+
+  0:X0 = data;
+  0:X1 = commit;
+  0:X2 = 42;
+  0:X3 = 1;
+}
+
+P0;
+
+STR X2, [X0];
+STR X3, [X1];
+
+exists (data=0 /\ commit=0)
