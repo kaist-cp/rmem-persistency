@@ -24,7 +24,7 @@ If it doesn't work, please read the `README.md` of [rmem](https://github.com/rem
 
 ## Run an example
 
-We use our model checker to verify several representative persistent synchronization examples, including *all* examples presented in the paper (modulo architectural differences) and the "Atomic Persists" example in [Raad et al. (Example 3)](http://plv.mpi-sws.org/pog/paper.pdf) for modeling persistent transaction. All of these examples are in `parmv8-view-examples`.
+We use our model checker to verify several representative persistent synchronization examples, including *all* examples presented in the paper (modulo architectural differences) and the "Atomic Persists" example in [Raad et al. (Example 3)](http://plv.mpi-sws.org/pog/paper.pdf) for modeling persistent transaction. All of these examples are in [parmv8-view-examples](parmv8-view-examples).
 
 To run one of examples:
 
@@ -92,7 +92,7 @@ We can conclude the invariant *"commit=1 ⇒ data=42"* holds in this case becaus
 
 ## Run all examples
 
-You can run all PARMv8-view examples in `parmv8-view-examples` by executing this script:
+You can run all PARMv8-view examples in [parmv8-view-examples](parmv8-view-examples) by executing this script:
 
 ```
 ./run_parmv8_all.p
