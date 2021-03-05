@@ -1,6 +1,15 @@
 # Model Checker for Persistency
 
-This model checker is based on [rmem](https://github.com/rems-project/rmem), executable concurrency models for ARMv8, RISC-V, Power, and x86. In particular, this model checker basically uses the Promising model for ARMv8 and RISC-V by Pulte et al.
+
+This model checker is a fork of [rmem](https://github.com/rems-project/rmem), executable concurrency models for ARMv8, RISC-V, Power, and x86.  This model checker reuses the Promising model for ARMv8 and RISC-V by Pulte et al.
+
+
+Related publications:
+
+- Christopher Pulte, Jean Pichon-Pharabod, Jeehoon Kang, Sung-Hwan Lee, Chung-Kil Hur.  Promising-ARM/RISC-V: a simpler and faster operational concurrency model.  PLDI 2019.
+
+- Kyeongmin Cho, Sung-Hwan Lee, Azalea Raad, and Jeehoon Kang.  Revamping Hardware Persistency Models: View-based and Axiomatic Persistency Models for Intel-x86 and ARMv8.  PLDI 2021 (conditionally accepted).
+
 
 ## Our extension
 
