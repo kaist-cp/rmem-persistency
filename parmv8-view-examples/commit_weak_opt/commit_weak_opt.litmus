@@ -1,4 +1,4 @@
-AArch64 commit1
+AArch64 commit_weak_opt
 {
   int64_t data = 0;
   int64_t commit = 0;
