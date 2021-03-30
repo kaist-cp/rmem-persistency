@@ -1,4 +1,4 @@
-AArch64 mca
+AArch64 flush_mca
 {
   int64_t X = 0;
   int64_t Y = 0;
