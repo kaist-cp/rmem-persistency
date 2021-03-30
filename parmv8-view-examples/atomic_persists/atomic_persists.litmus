@@ -1,4 +1,4 @@
-AArch64 atomic
+AArch64 atomic_persists
 {
   int64_t X = 0;
   int64_t Y = 0;
