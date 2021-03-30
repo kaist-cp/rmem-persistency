@@ -298,35 +298,6 @@ We can conclude the invariant *"commit=1 ⇒ data=42"* holds in this case becaus
 - **Target invariant**: "(data=0 ∨ data=42) ∧ (commit=0 ∨ commit=1)"
 - **Verification**: The invariant *holds* since all states which can be combined by the invariant are in the NVM States.
 
-#### "fob"
-
-- **Output**:
-    ```
-    Test fob Allowed
-    Shared-memory=0x0000000000001000 (Z)/8; 0x0000000000001100 (Y)/8; 0x0000000000001200 (X)/8;
-    Memory-writes=
-    States 4
-    2     *>Z=0x0; Y=0x0; X=0x0;  via "0"
-    3     :>Z=0x0; Y=0x0; X=0x1;  via "1;0"
-    4     :>Z=0x0; Y=0x1; X=0x1;  via "1;1;0;0"
-    1     :>Z=0x1; Y=0x1; X=0x1;  via "1;1;2;0;0"
-    NVM States 6
-    9     :>Z=0x0; Y=0x0; X=0x0;
-    8     :>Z=0x0; Y=0x0; X=0x1;
-    4     :>Z=0x0; Y=0x1; X=0x0;
-    5     :>Z=0x0; Y=0x1; X=0x1;
-    1     :>Z=0x1; Y=0x0; X=0x1;
-    1     :>Z=0x1; Y=0x1; X=0x1;
-    Unhandled exceptions 0
-    Ok
-    Condition exists (X=0x0 /\ Y=0x0 /\ Z=0x0)
-    Hash=301aa80501fde3394118d23d590d71cd
-    Observation fob Sometimes 1 3
-    Runtime: 0.053252 sec
-    ```
-- **Target invariant**: "z=1 ⇒ x=1"
-- **Verification**: The invariant *holds* since there is no NVM state other than x=1 when z=1.
-
 #### "flush_mca"
 
 - **Output**:
@@ -369,6 +340,35 @@ We can conclude the invariant *"commit=1 ⇒ data=42"* holds in this case becaus
     ```
 - **Target invariant**: "z=w=1 ⇒ (x=1 ∨ y=1)"
 - **Verification**: The invariant *holds* since there is no NVM state of {x≠1, y≠1} when z=w=1.
+
+#### "fob"
+
+- **Output**:
+    ```
+    Test fob Allowed
+    Shared-memory=0x0000000000001000 (Z)/8; 0x0000000000001100 (Y)/8; 0x0000000000001200 (X)/8;
+    Memory-writes=
+    States 4
+    2     *>Z=0x0; Y=0x0; X=0x0;  via "0"
+    3     :>Z=0x0; Y=0x0; X=0x1;  via "1;0"
+    4     :>Z=0x0; Y=0x1; X=0x1;  via "1;1;0;0"
+    1     :>Z=0x1; Y=0x1; X=0x1;  via "1;1;2;0;0"
+    NVM States 6
+    9     :>Z=0x0; Y=0x0; X=0x0;
+    8     :>Z=0x0; Y=0x0; X=0x1;
+    4     :>Z=0x0; Y=0x1; X=0x0;
+    5     :>Z=0x0; Y=0x1; X=0x1;
+    1     :>Z=0x1; Y=0x0; X=0x1;
+    1     :>Z=0x1; Y=0x1; X=0x1;
+    Unhandled exceptions 0
+    Ok
+    Condition exists (X=0x0 /\ Y=0x0 /\ Z=0x0)
+    Hash=301aa80501fde3394118d23d590d71cd
+    Observation fob Sometimes 1 3
+    Runtime: 0.053252 sec
+    ```
+- **Target invariant**: "z=1 ⇒ x=1"
+- **Verification**: The invariant *holds* since there is no NVM state other than x=1 when z=1.
 
 ## Run all examples
 
