@@ -33,6 +33,8 @@ jobs:
 
       - run: opam repository add rems https://github.com/rems-project/opam-repository.git#opam2
 
+      - run: opam install sail.0.14
+
       - run: opam install --deps-only .
 
       - name: Build
