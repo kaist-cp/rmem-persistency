@@ -16,7 +16,7 @@ jobs:
         os:
           - ubuntu-latest
         ocaml-version:
-          - 4.10.1
+          - 4.10.2
 
     runs-on: ${{ matrix.os }}
 
@@ -32,6 +32,8 @@ jobs:
       - run: sudo apt-get install -y findutils libgmp-dev m4 perl pkg-config zlib1g-dev z3
 
       - run: opam repository add rems https://github.com/rems-project/opam-repository.git#opam2
+
+      - run: opam install sail.0.14
 
       - run: opam install --deps-only .
 
