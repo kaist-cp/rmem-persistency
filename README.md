@@ -99,7 +99,7 @@ Observation commit1 Sometimes 1 2
 Runtime: 0.033494 sec
 ```
 
-We can conclude the invariant *"commit=1 ⇒ data=42"* holds in this case because there is no NVM state other than *data=42*(`0x2a`) when *commit=1*.
+We can conclude the invariant *"commit=1 ⇒ data=42"* holds in this case because there is no other NVM state than *data=42*(`0x2a`) when *commit=1*.
 
 ### Expected output and verification of all examples
 
@@ -138,7 +138,7 @@ We can conclude the invariant *"commit=1 ⇒ data=42"* holds in this case becaus
     Runtime: 0.276038 sec
     ```
 - **Target invariant**: "z=1 ⇒ x=1 ∧ y=1"
-- **Verification**: The invariant *holds* since there is no NVM state other than {x=1, y=1} when z=1.
+- **Verification**: The invariant *holds* since there is no other NVM state than {x=1, y=1} when z=1.
 
 #### "commit1"
 
@@ -163,7 +163,7 @@ We can conclude the invariant *"commit=1 ⇒ data=42"* holds in this case becaus
     Runtime: 0.037037 sec
     ```
 - **Target invariant**: "commit=1 ⇒ data=42"
-- **Verification**: The invariant *holds* since there is no NVM state other than data=42 when commit=1.
+- **Verification**: The invariant *holds* since there is no other NVM state than data=42 when commit=1.
 
 #### "commit2"
 
@@ -188,7 +188,7 @@ We can conclude the invariant *"commit=1 ⇒ data=42"* holds in this case becaus
     Runtime: 0.039360 sec
     ```
 - **Target invariant**: "commit=1 ⇒ data=42"
-- **Verification**: The invariant *holds* since there is no NVM state other than data=42 when commit=1.
+- **Verification**: The invariant *holds* since there is no other NVM state than data=42 when commit=1.
 
 #### "commit2_opt"
 
@@ -214,7 +214,7 @@ We can conclude the invariant *"commit=1 ⇒ data=42"* holds in this case becaus
     Runtime: 0.040088 sec
     ```
 - **Target invariant**: "(data=0 ∨ data=42) ∧ (commit=0 ∨ commit=1)"
-- **Verification**: The invariant *holds* since all states which can be combined by the invariant are in the NVM States.
+- **Verification**: The invariant *holds* since all states in the NVM States contain only data = 0 or 42, commit = 0 or 1.
 
 #### "commit_opt"
 
@@ -242,7 +242,7 @@ We can conclude the invariant *"commit=1 ⇒ data=42"* holds in this case becaus
     Runtime: 0.041574 sec
     ```
 - **Target invariant**: "commit=1 ⇒ data1=42 ∧ data2=7"
-- **Verification**: The invariant *holds* since there is no NVM state other than {data1=42, data2=7} when commit=1.
+- **Verification**: The invariant *holds* since there is no other NVM state than {data1=42, data2=7} when commit=1.
 
 #### "commit_weak"
 
@@ -269,7 +269,7 @@ We can conclude the invariant *"commit=1 ⇒ data=42"* holds in this case becaus
     Runtime: 0.038537 sec
     ```
 - **Target invariant**: "commit=1 ⇒ data=42"
-- **Verification**: The invariant does *not* hold since there is a state data=0 when commit=1.
+- **Verification**: The invariant *does not hold* since there is a state data=0 when commit=1.
 
 #### "commit_weak_opt"
 
@@ -296,7 +296,7 @@ We can conclude the invariant *"commit=1 ⇒ data=42"* holds in this case becaus
     Runtime: 0.038746 sec
     ```
 - **Target invariant**: "(data=0 ∨ data=42) ∧ (commit=0 ∨ commit=1)"
-- **Verification**: The invariant *holds* since all states which can be combined by the invariant are in the NVM States.
+- **Verification**: The invariant *holds* since all states in the NVM States contain only data = 0 or 42, commit = 0 or 1.
 
 #### "flush_mca"
 
@@ -339,7 +339,7 @@ We can conclude the invariant *"commit=1 ⇒ data=42"* holds in this case becaus
     Runtime: 0.072553 sec
     ```
 - **Target invariant**: "z=w=1 ⇒ (x=1 ∨ y=1)"
-- **Verification**: The invariant *holds* since there is no NVM state of {x≠1, y≠1} when z=w=1.
+- **Verification**: The invariant *holds* since all states in the NVM States, when z=w=1, contain only x=1 or y=1.
 
 #### "fob"
 
@@ -368,7 +368,7 @@ We can conclude the invariant *"commit=1 ⇒ data=42"* holds in this case becaus
     Runtime: 0.053252 sec
     ```
 - **Target invariant**: "z=1 ⇒ x=1"
-- **Verification**: The invariant *holds* since there is no NVM state other than x=1 when z=1.
+- **Verification**: The invariant *holds* since there is no other NVM state than x=1 when z=1.
 
 ## Run all examples
 
