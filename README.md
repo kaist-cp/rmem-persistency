@@ -6,9 +6,9 @@ This model checker is a fork of [rmem](https://github.com/rems-project/rmem), ex
 
 Related publications:
 
-- Christopher Pulte, Jean Pichon-Pharabod, Jeehoon Kang, Sung-Hwan Lee, Chung-Kil Hur.  Promising-ARM/RISC-V: a simpler and faster operational concurrency model.  PLDI 2019.
+1. Christopher Pulte, Jean Pichon-Pharabod, Jeehoon Kang, Sung-Hwan Lee, Chung-Kil Hur.  Promising-ARM/RISC-V: a simpler and faster operational concurrency model.  PLDI 2019.
 
-- Kyeongmin Cho, Sung-Hwan Lee, Azalea Raad, and Jeehoon Kang.  Revamping Hardware Persistency Models: View-based and Axiomatic Persistency Models for Intel-x86 and ARMv8.  PLDI 2021 (conditionally accepted).
+2. Kyeongmin Cho, Sung-Hwan Lee, Azalea Raad, and Jeehoon Kang.  Revamping Hardware Persistency Models: View-based and Axiomatic Persistency Models for Intel-x86 and ARMv8.  PLDI 2021 (conditionally accepted).
 
 
 ## Our extension
@@ -33,7 +33,8 @@ If it doesn't work, please read the `README.md` of [rmem](https://github.com/rem
 
 ## Run an example
 
-We use our model checker to verify several representative persistent synchronization examples, including the "Atomic Persists" example in [Raad et al. (Example 3)](http://plv.mpi-sws.org/pog/paper.pdf) for modeling persistent transaction. All of these examples are in [parmv8-view-examples](parmv8-view-examples).
+We use our model checker to verify several representative persistent synchronization examples in [2], including the "Atomic Persists" example in [Raad et al. (Example 3)](http://plv.mpi-sws.org/pog/paper.pdf) for modeling persistent transaction. All of these examples are in [parmv8-view-examples](parmv8-view-examples).
+(The CommitE example involving I/O in [2] is not verified yet by the model checker because it currently does not support I/O instructions. We believe it is straightforward to support them as done in [Kang et al.](https://sf.snu.ac.kr/promise-concurrency/) and verify the example.)
 
 ### How to run and verify an example
 
@@ -138,7 +139,7 @@ We can conclude the invariant *"commit=1 ⇒ data=42"* holds in this case becaus
     Runtime: 0.276038 sec
     ```
 - **Target invariant**: "z=1 ⇒ x=1 ∧ y=1"
-- **Verification**: The invariant *holds* since there is no other NVM state than {x=1, y=1} when z=1.
+- **Verification**: The invariant *holds* since there are no other NVM states than {x=1, y=1} when z=1.
 
 #### "commit1"
 
@@ -163,7 +164,7 @@ We can conclude the invariant *"commit=1 ⇒ data=42"* holds in this case becaus
     Runtime: 0.037037 sec
     ```
 - **Target invariant**: "commit=1 ⇒ data=42"
-- **Verification**: The invariant *holds* since there is no other NVM state than data=42 when commit=1.
+- **Verification**: The invariant *holds* since there are no other NVM states than data=42 when commit=1.
 
 #### "commit2"
 
@@ -188,7 +189,7 @@ We can conclude the invariant *"commit=1 ⇒ data=42"* holds in this case becaus
     Runtime: 0.039360 sec
     ```
 - **Target invariant**: "commit=1 ⇒ data=42"
-- **Verification**: The invariant *holds* since there is no other NVM state than data=42 when commit=1.
+- **Verification**: The invariant *holds* since there are no other NVM states than data=42 when commit=1.
 
 #### "commit2_opt"
 
@@ -214,7 +215,7 @@ We can conclude the invariant *"commit=1 ⇒ data=42"* holds in this case becaus
     Runtime: 0.040088 sec
     ```
 - **Target invariant**: "(data=0 ∨ data=42) ∧ (commit=0 ∨ commit=1)"
-- **Verification**: The invariant *holds* since all states in the NVM States contain only data = 0 or 42, commit = 0 or 1.
+- **Verification**: The invariant *holds* since all NVM states contain only data = 0 or 42, commit = 0 or 1.
 
 #### "commit_opt"
 
@@ -242,7 +243,7 @@ We can conclude the invariant *"commit=1 ⇒ data=42"* holds in this case becaus
     Runtime: 0.041574 sec
     ```
 - **Target invariant**: "commit=1 ⇒ data1=42 ∧ data2=7"
-- **Verification**: The invariant *holds* since there is no other NVM state than {data1=42, data2=7} when commit=1.
+- **Verification**: The invariant *holds* since there are no other NVM states than {data1=42, data2=7} when commit=1.
 
 #### "commit_weak"
 
@@ -296,7 +297,7 @@ We can conclude the invariant *"commit=1 ⇒ data=42"* holds in this case becaus
     Runtime: 0.038746 sec
     ```
 - **Target invariant**: "(data=0 ∨ data=42) ∧ (commit=0 ∨ commit=1)"
-- **Verification**: The invariant *holds* since all states in the NVM States contain only data = 0 or 42, commit = 0 or 1.
+- **Verification**: The invariant *holds* since all NVM states contain only data = 0 or 42, commit = 0 or 1.
 
 #### "flush_mca"
 
@@ -339,7 +340,7 @@ We can conclude the invariant *"commit=1 ⇒ data=42"* holds in this case becaus
     Runtime: 0.072553 sec
     ```
 - **Target invariant**: "z=w=1 ⇒ (x=1 ∨ y=1)"
-- **Verification**: The invariant *holds* since all states in the NVM States, when z=w=1, contain only x=1 or y=1.
+- **Verification**: The invariant *holds* since all NVM states, when z=w=1, contain only x=1 or y=1.
 
 #### "fob"
 
@@ -368,7 +369,7 @@ We can conclude the invariant *"commit=1 ⇒ data=42"* holds in this case becaus
     Runtime: 0.053252 sec
     ```
 - **Target invariant**: "z=1 ⇒ x=1"
-- **Verification**: The invariant *holds* since there is no other NVM state than x=1 when z=1.
+- **Verification**: The invariant *holds* since there are no other NVM states than x=1 when z=1.
 
 ## Run all examples
 
