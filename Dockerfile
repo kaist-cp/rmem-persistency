@@ -8,6 +8,7 @@ RUN sudo apt-get update \
     && sudo rm -rf /var/lib/apt/lists/* \
     && opam repository add rems https://github.com/rems-project/opam-repository.git#opam2 \
     && opam update \
+    && opam install sail.0.14 \
     && opam install --deps-only .
 
 RUN eval $(opam env) \

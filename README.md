@@ -1,22 +1,22 @@
 # Model Checker for Persistency
 
 
-This model checker is a fork of [rmem](https://github.com/rems-project/rmem), executable concurrency models for ARMv8, RISC-V, Power, and x86.  This model checker reuses the Promising model for ARMv8 and RISC-V by Pulte et al.
+This model checker is a fork of [rmem](https://github.com/rems-project/rmem), executable concurrency models for Armv8, RISC-V, Power, and x86.  This model checker reuses the Promising model for Armv8 and RISC-V by Pulte et al.
 
 
 Related publications:
 
 1. Christopher Pulte, Jean Pichon-Pharabod, Jeehoon Kang, Sung-Hwan Lee, Chung-Kil Hur.  Promising-ARM/RISC-V: a simpler and faster operational concurrency model.  PLDI 2019.
 
-2. Kyeongmin Cho, Sung-Hwan Lee, Azalea Raad, and Jeehoon Kang.  Revamping Hardware Persistency Models: View-based and Axiomatic Persistency Models for Intel-x86 and ARMv8.  PLDI 2021 (conditionally accepted).
+2. Kyeongmin Cho, Sung-Hwan Lee, Azalea Raad, and Jeehoon Kang.  Revamping Hardware Persistency Models: View-based and Axiomatic Persistency Models for Intel-x86 and Armv8.  PLDI 2021 (conditionally accepted).
 
 
 ## Our extension
 
-We extend the original checker to the PARMv8 model checker by supporting:
+We extend the original checker to the PArmv8 model checker by supporting:
 
-- ARMv8 instruction for persistency (i.e., DC CVAP)
-- persistency views of PARMv8-view (i.e., VpReady, VpAsync, VpCommit)
+- Armv8 instruction for persistency (i.e., DC CVAP)
+- persistency views of PArmv8-view (i.e., VpReady, VpAsync, VpCommit)
 - enumeration of states of when crash occurs at arbitrary point
 
 ## Build
@@ -373,7 +373,7 @@ We can conclude the invariant *"commit=1 ⇒ data=42"* holds in this case becaus
 
 ## Run all examples
 
-You can run all PARMv8-view examples in [parmv8-view-examples](parmv8-view-examples) by executing this script:
+You can run all PArmv8-view examples in [parmv8-view-examples](parmv8-view-examples) by executing this script:
 
 ```
 ./run_parmv8_all.p
