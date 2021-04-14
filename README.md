@@ -8,7 +8,7 @@ Related publications:
 
 1. Christopher Pulte, Jean Pichon-Pharabod, Jeehoon Kang, Sung-Hwan Lee, Chung-Kil Hur.  Promising-ARM/RISC-V: a simpler and faster operational concurrency model.  PLDI 2019.
 
-2. Kyeongmin Cho, Sung-Hwan Lee, Azalea Raad, and Jeehoon Kang.  Revamping Hardware Persistency Models: View-based and Axiomatic Persistency Models for Intel-x86 and Armv8.  PLDI 2021 (conditionally accepted).
+2. Kyeongmin Cho, Sung-Hwan Lee, Azalea Raad, and Jeehoon Kang.  Revamping Hardware Persistency Models: View-Based and Axiomatic Persistency Models for Intel-x86 and Armv8.  PLDI 2021 (conditionally accepted).
 
 
 ## Our extension
